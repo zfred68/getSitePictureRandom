@@ -15,6 +15,12 @@ add a gadget by URL, using the saved url from above
 store images to be randomly selected in your google drive,
 the code uses the base folder /web-resources/images
 from there sub-folders "locals","intl","afar" can be selected
+see the code defining this...
 
+var imagelibbase = "/web-resources/images";
+var imagelibs = ["locals","intl","afar"];
+
+....
+so drop some images in these folders
 If you give the images a description, that will appear as capture text under the image
 
