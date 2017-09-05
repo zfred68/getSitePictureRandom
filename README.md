@@ -17,9 +17,10 @@ the code uses the base folder /web-resources/images
 from there sub-folders "locals","intl","afar" can be selected
 see the code defining this...
 
+<code>
 var imagelibbase = "/web-resources/images";
 var imagelibs = ["locals","intl","afar"];
-
+</code>
 ....
 so drop some images in these folders
 If you give the images a description, that will appear as capture text under the image
