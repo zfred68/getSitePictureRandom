@@ -11,19 +11,17 @@ https://googledrive.com/host/<folderID>/<filename>
 
 var imagelibbase = "/web-resources/images";
 var imagelibs = ["locals","intl","afar"];
+var MyLog=MyLogger;
 
-function afile(name,id,desc) {
+function afile(name,id) {
   this.name=name;
   this.id=id;
-  this.desc=desc;
 }
 
 function doGet(e) {
   
- // var app = HtmlService.createHtmlOutputFromFile('index.html')
- //     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  var app = HtmlService.createTemplateFromFile('index.html')
-//      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  var app = HtmlService.createHtmlOutputFromFile('index.html')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
   
   if(e!=undefined) {
      var arg1 = e.parameter["folder"];
@@ -36,23 +34,27 @@ function doGet(e) {
   var user_loginid = Session.getUser().getUserLoginId();
 
   var f = getRandomPic(arg1);
-  var p = "https://docs.google.com/uc?id="+f.id+"&export=download";
-  var d = "";
-  var capture="";
-  if(f.desc !=null) {
-    d='ALT="'+f.desc+'" ';
-    //capture='<p style="max-width: 100%;text-align: center;  font-style: italic;  font-size: smaller;  text-indent: 0pt;">'+f.desc+'</p>';
-    //app.setContent('<style> #randomPIC p { max-width: 100%;text-align: center;  font-style: italic;  font-size: smaller;  text-indent: 0pt;} </style>');
-    app.pictureAlt="ALT=\"" + f.desc + "\"";
-    app.capture=f.desc;
-  }else {
-    app.pictureAlt="";
-    app.capture="";
+  loghere('getSitePictureRandom:'+f);
+    
+  app.setContent('<div id="randomPIC" ><image src="'+f+'"></div>');
+  return app;
+}
+
+function doGet0(e) {
+//  var app = UiApp.createApplication();`
+  if(e!=undefined) {
+     var arg1 = e.parameter["folder"];
   }
-  app.pictureid=f.id;
-  return app.evaluate();
-  //app.setContent('<div id="randomPIC" style="width:100%" ><image src="'+p+'" '+d+'  style="width:100%">'+capture+'</div>');
-  //return app;
+  
+  if(arg1==null) {
+    arg1=imagelibs[0];
+  }
+  
+  var user_loginid = Session.getUser().getUserLoginId();
+
+  var f = getRandomPic(arg1);
+  loghere('getSitePictureRandom:'+f);
+  return ContentService.createTextOutput('<image src="'+f +'">');
 }
 
 function getRandomPic(subfolder) {
@@ -71,7 +73,7 @@ function getRandomPic(subfolder) {
     var n = type.search("image");
     
     if(type.search("image")>=0) {
-      var a = new afile(name,file.getId(),file.getDescription());
+      var a = new afile(name,file.getId());
       apics.push(a);
     }
  }
@@ -79,19 +81,24 @@ function getRandomPic(subfolder) {
  var len = apics.length;
  var i = Math.round(rn*len);
  var a = apics[i];
- var id= apics[i].id;
- var desc= apics[i].desc;
- Logger.log(a.name+ ' id:'+id+ ' desc:'+desc);
-// return "https://docs.google.com/uc?id="+id+"&export=download";
- return apics[i];
+ var id=apics[i].id;
+ 
+ return "https://docs.google.com/uc?id="+id+"&export=download";
 }
 
+//
+// getBasefolder( "/Folder A/Folder B/ Folder C" )
+// returns the last folder in the path 
+// or throws exception
+//
 function getBasefolder(path) {
  // Remove extra slashes and trim the path
   var fullpath = path.replace(/^\/*|\/*$/g, '').replace(/^\s*|\s*$/g, '').split("/");
    // Always start with the main Drive folder
   var folder = DriveApp.getRootFolder();
   var rootname = folder.getName();
+  var nfullpathFolders = fullpath.length-1;
+  var n;
   
   for (var subfolder in fullpath) {
     
@@ -99,14 +106,66 @@ function getBasefolder(path) {
     var folders = folder.getFoldersByName(name);
  
     // If folder does not exit, exit
-    if(folders.hasNext()) {
+    while(folders.hasNext()) {
       folder= folders.next();
-    }else {
-      throw "bad path";
+      n = folder.getName();
+      var i = Number(subfolder);
+      if(n==name) {
+        if(Number(subfolder) == nfullpathFolders)
+          return folder;
+        break;
+      }
     }
-    
   }
-  return folder;
+  
+  throw "bad path";
 }
 
 
+function t() {
+
+ MyLog = MyLogger.useSpreadsheet('17ViJRrSjNmz-MEMjA6f5IclJv8RwQLjq4h5TdzzkqgU');
+ 
+}
+
+function t2() {
+
+  loghere('test here getSitePictureRandom');
+}
+
+var log_sheet=null;
+var log_sheet_id = '17ViJRrSjNmz-MEMjA6f5IclJv8RwQLjq4h5TdzzkqgU';
+                    
+function loghere(s) {
+
+  if(log_sheet==null) {
+    try {
+        var MyLog = MyLogger.useSpreadsheet('17ViJRrSjNmz-MEMjA6f5IclJv8RwQLjq4h5TdzzkqgU');
+        var ss = MyLog.getSheet();  
+        var name = ss.getName();
+        log_sheet = ss;//.getSheetByName("Log");
+        
+        if(log_sheet==null) {
+          log_sheet= ss.insertSheet('Log')         
+        }
+        
+        if (log_sheet != null) {
+          var now = new Date();
+          log_sheet.appendRow([now,s]);
+        }
+        
+     }catch(e) {
+        var exception = e.name;
+        if (exception === "Exception" ){
+          Logger.log('Exception:');
+        }
+    }
+  }
+  else
+  {
+          var now = new Date();
+          log_sheet.appendRow([now,s]);
+    
+  }
+
+}
