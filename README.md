@@ -23,6 +23,6 @@ var imagelibs = ["locals","intl","afar"];
 </code>
 </pre>
 ....
-so drop some images in these folders
+so drop some images in these folders.
 If you give the images a description, that will appear as capture text under the image
 
