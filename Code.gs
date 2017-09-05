@@ -5,6 +5,7 @@ this app script is from Google Site->Manage->App Scripts->Add new script
 Provided that you put your files in a public folder, you can get any file in a folder by this URL:
 
 https://googledrive.com/host/<folderID>/<filename>
+https://docs.google.com/uc?id=<file id>&export=download
 
 **/
 
@@ -20,10 +21,7 @@ function afile(name,id,desc) {
 
 function doGet(e) {
   
- // var app = HtmlService.createHtmlOutputFromFile('index.html')
- //     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  var app = HtmlService.createTemplateFromFile('index.html')
-//      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  var app = HtmlService.createTemplateFromFile('index.html');
   
   if(e!=undefined) {
      var arg1 = e.parameter["folder"];
@@ -36,13 +34,9 @@ function doGet(e) {
   var user_loginid = Session.getUser().getUserLoginId();
 
   var f = getRandomPic(arg1);
-  var p = "https://docs.google.com/uc?id="+f.id+"&export=download";
-  var d = "";
+  //var p = "https://docs.google.com/uc?id="+f.id+"&export=download";
   var capture="";
   if(f.desc !=null) {
-    d='ALT="'+f.desc+'" ';
-    //capture='<p style="max-width: 100%;text-align: center;  font-style: italic;  font-size: smaller;  text-indent: 0pt;">'+f.desc+'</p>';
-    //app.setContent('<style> #randomPIC p { max-width: 100%;text-align: center;  font-style: italic;  font-size: smaller;  text-indent: 0pt;} </style>');
     app.pictureAlt="ALT=\"" + f.desc + "\"";
     app.capture=f.desc;
   }else {
@@ -51,8 +45,6 @@ function doGet(e) {
   }
   app.pictureid=f.id;
   return app.evaluate();
-  //app.setContent('<div id="randomPIC" style="width:100%" ><image src="'+p+'" '+d+'  style="width:100%">'+capture+'</div>');
-  //return app;
 }
 
 function getRandomPic(subfolder) {
@@ -78,11 +70,9 @@ function getRandomPic(subfolder) {
  var rn = Math.random();
  var len = apics.length;
  var i = Math.round(rn*len);
- var a = apics[i];
- var id= apics[i].id;
- var desc= apics[i].desc;
- //Loggero.log(a.name+ ' id:'+id+ ' desc:'+desc);
-// return "https://docs.google.com/uc?id="+id+"&export=download";
+ //var a = apics[i];
+ //var id= apics[i].id;
+ //var desc= apics[i].desc;
  return apics[i];
 }
 
